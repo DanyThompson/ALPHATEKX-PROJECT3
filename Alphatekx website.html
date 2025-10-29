@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AlphatekX — AI Website Builder & Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; font-family:'Poppins',sans-serif; background:#0f172a; color:#e5e7eb; scroll-behavior:smooth;}
+  h1,h2,h3,h4 { color:#facc15; margin:10px 0;}
+  a { text-decoration:none; color:#e5e7eb; font-weight:600;}
+  a:hover { color:#7c3aed; transition:0.3s;}
+  section { padding:50px 20px; max-width:1000px; margin:auto; opacity:0; transform:translateY(50px); transition:0.6s ease-out;}
+  section.show { opacity:1; transform:translateY(0);}
+  input, textarea, select { width:100%; padding:10px; border-radius:8px; border:none; margin:10px 0; background:#1e293b; color:#e5e7eb; }
+  button { padding:10px 20px; border:none; border-radius:8px; background:#7c3aed; color:white; font-weight:bold; cursor:pointer; }
+  button:hover { background:#6d28d9; }
+  .btn.alt { background:#1e293b; color:#facc15; border:1px solid #7c3aed; }
+  .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+
+  header { position:sticky; top:0; background:rgba(15,23,42,0.95); backdrop-filter:blur(8px); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; z-index:1000;}
+  .nav-links { display:flex; gap:15px; }
+  .hamburger { display:none; flex-direction:column; cursor:pointer; gap:4px; }
+  .hamburger div { width:25px; height:3px; background:#e5e7eb; }
+  @media (max-width:768px){
+    .nav-links { display:none; flex-direction:column; background:#0f172a; position:absolute; top:60px; right:0; width:200px; border-radius:8px; padding:10px; }
+    .nav-links.active { display:flex; }
+    .hamburger { display:flex; }
+  }
+
+  .hero { background: linear-gradient(rgba(15,23,42,0.7), rgba(15,23,42,0.7)), url("https://picsum.photos/1600/500") center/cover no-repeat; color:#facc15; padding:70px 20px; border-bottom:4px solid black; border-radius:12px; }
+  .hero p { color:#e5e7eb; }
+
+  .card { background:#1e293b; padding:20px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.5); margin-bottom:20px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+
+  .modal { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; }
+  .modal .box { background:#0f172a; padding:20px; border-radius:12px; width:92%; max-width:900px; max-height:86vh; overflow:auto; color:#e5e7eb; }
+  .hidden { display:none; }
+
+  iframe { width:100%; height:360px; border:1px solid #7c3aed; border-radius:12px; margin-top:10px; }
+  .img-thumb { max-width: 100px; height: auto; display: block; }
+  .ok { color: #22c55e; }
+  .bad { color: #ef4444; }
+
+  footer { background:#1e293b; color:#e5e7eb; text-align:center; padding:20px; margin-top:40px; border-radius:12px; }
+
+  /* New Tool Selection Grid */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .tool-card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    border: 2px solid transparent;
+  }
+  .tool-card:hover {
+    transform: translateY(-5px);
+    background: #151d2e;
+    border-color: #7c3aed;
+  }
+  .tool-card h4 {
+    color: #facc15;
+    margin: 5px 0 0 0;
+    font-size: 1.1em;
+  }
+  .tool-card p {
+    color: #94a3b8;
+    font-size: 0.8em;
+    margin: 5px 0 0 0;
+  }
+  .tool-card .icon {
+    font-size: 2em;
+    color: #7c3aed;
+  }
+  /* Tool Content Styles */
+  .tool-content {
+    margin-top: 20px;
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 12px;
+    border: 1px solid #7c3aed;
+  }
+
+
+  /* File-to-Link Converter Styles */
+  .ftl-container { background:#1e293b; padding:20px; border-radius:12px; margin-top:20px; }
+  .ftl-container h4 { color:#facc15; }
+  .ftl-container input[type="file"] { margin:10px 0; padding:10px; width:100%; border-radius:8px; border:none; background:#0f172a; color:#e5e7eb; }
+  .ftl-container button { margin:5px 5px 10px 0; }
+  .ftl-container .url-output { background:#0f172a; color:#e5e7eb; padding:10px; border-radius:8px; word-break:break-all; }
+  .ftl-preview { max-width:100%; margin-top:10px; border-radius:8px; }
+
+  /* AI Assistant Chat Styles */
+  #aiAssistantTool header { background-color:#7c3aed; color:#fff; padding:10px; border-radius:8px; }
+  #aiAssistantTool #chat-container { background-color:#1e293b; padding:10px; border-radius:12px; }
+  #aiAssistantTool #chat-box { height:300px; overflow-y:auto; background:#0f172a; padding:10px; border-radius:8px; }
+  #aiAssistantTool .message.user { background:#22c55e; color:#fff; border-bottom-right-radius:0; margin-left:80px; margin-right:20px; padding:10px 14px; border-radius:12px; display:inline-block; }
+  #aiAssistantTool .message.bot { background:#e5e7eb; color:#0f172a; border-bottom-left-radius:0; margin-left:20px; margin-right:80px; padding:10px 14px; border-radius:12px; display:inline-block; font-style:italic; font-weight:bold; }
+  #aiAssistantTool #input-area { display:flex; gap:10px; margin-top:10px; }
+  #aiAssistantTool #user-input { flex:1; padding:10px; border-radius:20px; border:1px solid #7c3aed; background:#1e293b; color:#e5e7eb; }
+  #aiAssistantTool #send-btn { background:#7c3aed; width:45px; height:45px; border-radius:50%; cursor:pointer; color:#fff; font-size:18px; border:none; }
+  #aiAssistantTool #clear-btn { background:#facc15; color:#0f172a; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; }
+  
+  /* AI Quiz Tool Styles for Dark Theme */
+  #quizTool .question-text { color: #facc15; }
+  #quizTool .answer-list li { background: #1e293b; color: #e5e7eb; border: 1px solid #1e293b; }
+  #quizTool .answer-list li:hover { background: #0f172a; border-color: #7c3aed; }
+  #quizTool .next-btn, #quizTool .submit-btn { background-color: #7c3aed; }
+  #quizTool .next-btn:hover, #quizTool .submit-btn:hover { background-color: #6d28d9; }
+  #quizTool .correct { background-color: #22c55e !important; color: #0f172a; }
+  #quizTool .incorrect { background-color: #ef4444 !important; color: white; }
+
+  /* Library Tool Styles for Dark Theme */
+  #libraryTool #searchContainer { 
+    display: flex; 
+    justify-content: center; 
+    margin-bottom: 20px; 
+    gap: 10px; 
+  }
+  #libraryTool #searchBar { 
+    width: 100%; 
+    max-width: 300px;
+    padding: 12px; 
+    border: 1px solid #7c3aed; 
+    border-radius: 8px; 
+    font-size: 16px; 
+    background-color: #0f172a;
+    color: #e5e7eb;
+  }
+  #libraryTool #searchBtn { 
+    padding: 12px 20px; 
+    border: none; 
+    background-color: #facc15; 
+    color: #0f172a;
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: 700;
+  }
+  #libraryTool #searchBtn:hover {
+    background-color: #eab308;
+  }
+  #libraryTool .books-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding-top: 10px;
+  }
+  #libraryTool .book-card {
+    background: #0f172a;
+    border: 1px solid #7c3aed;
+    padding: 15px;
+    border-radius: 8px;
+    width: 200px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  #libraryTool .book-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #7c3aed;
+  }
+  #libraryTool .book-card h3 {
+    color: #facc15;
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  #libraryTool .book-card button {
+    background-color: #7c3aed;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 3px;
+    font-size: 14px;
+  }
+  #libraryTool .book-card button:hover {
+    background-color: #6d28d9;
+  }
+
+  /* --- NEW OPay Account Styling --- */
+  .opay-account {
+    background: #111827; /* Darker than card for contrast */
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.5); /* Subtle purple glow */
+    border: 2px solid;
+    border-image: linear-gradient(to right, #facc15, #7c3aed) 1; /* Gold to purple gradient border */
+    text-align: center;
+  }
+  .opay-account h4 {
+    color: #facc15;
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.5em;
+  }
+  .opay-account .account-number {
+    display: inline-block;
+    background: #0f172a; /* Deep blue background */
+    color: #fff; /* White text for number */
+    font-size: 1.8em;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 8px;
+    letter-spacing: 2px;
+    cursor: copy; /* Indicate it's copyable */
+    transition: background 0.2s;
+  }
+  .opay-account .account-number:hover {
+    background: #1e293b;
+  }
+  .opay-account p {
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 0.9em;
+  }
+  /* --- END OPay Styling --- */
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AlphatekX Technologies</h1>
+  <div class="hamburger" onclick="toggleMenu()">
+    <div></div><div></div><div></div>
+  </div>
+  <nav class="nav-links">
+    <a href="#home">Home</a>
+    <a href="#requestForm">Request</a>
+    <a href="#builder">Website Builder</a>
+    <a href="#admin" id="openAdminLink">Admin</a>
+  </nav>
+</header>
+
+<section id="home" class="hero show">
+  <h2>Get a unique website made by AI — after payment verification</h2>
+  <p>Request a website, pay ₦1000, send screenshot to WhatsApp, admin verifies and issues a one-time unlock code — then you generate your website.</p>
+</section>
+
+<section id="about" class="show">
+  <h3>About Us</h3>
+  <div class="card">
+    <p>AlphatekX Technologies is a digital company focused on making website creation simple. 
+     AlphatekX Technologies — Instant. Affordable. Limitless.
+
+Tired of slow, expensive, or complicated digital projects? AlphatekX is your all-in-one AI hub that turns your ideas into reality instantly. Just describe it, and our AI builds it—a professional website in clean, ready-to-use code.Imagine describing your dream website and seeing it built instantly. That’s AlphatekX. No coding, no delays—just AI-powered creation at lightning speed.
+
+Our 6-in-1 Digital Toolkit:
+
+1. AI Chat Assistant – Get answers, ideas, or expert advice anytime.
+
+
+2. File-to-Link Converter – Share large videos, pictures, or audio instantly.
+
+
+3. Code Minifier & Formatter – Make your website faster and cleaner.
+
+
+4. AlphatekX Library (PDF Search) – Instantly find books, reports, or research online.
+
+
+5. AI Quiz Tool – Challenge yourself and learn something new every day.
+
+
+6. ibrary - it can help you search for books faster .
+
+
+Save time, cut costs, and create anything you imagine. AlphatekX brings the future of digital creation to your fingertips!
+</p>
+  </div>
+</section>
+
+<section id="how" class="show">
+  <h3>How It Works</h3>
+  <div class="grid">
+    <div class="card"><h4>1. Describe</h4><p>Tell us what kind of website you want.</p></div>
+    <div class="card"><h4>2. Pay</h4><p>Send ₦1000 to our OPay account, take a screenshot of payment.</p></div>
+    <div class="card"><h4>3. Verify</h4><p>Send the screenshot on WhatsApp, admin approves your payment.</p></div>
+    <div class="card"><h4>4. Unlock</h4><p>Admin gives you a one-time approval code to unlock the builder.</p></div>
+    <div class="card"><h4>5. Generate</h4><p>Use the AI Website Builder to create your website instantly.</p></div>
+  </div>
+</section>
+
+<section id="pricing" class="show">
+  <h3>Pricing</h3>
+  <div class="card">
+    <h4>Basic Unlock</h4>
+    <p>💳 Price: <b>₦1000</b></p>
+    <p>This gives you one unlock code to access the builder and generate your website.</p>
+
+    <div class="opay-account">
+        <h4>Make Your Payment Here:</h4>
+        <p style="color:#e5e7eb;">Transfer **₦1000** to this **OPay** Account:</p>
+        <span class="account-number" onclick="copyOpayNumber()">070 3349 7264</span>
+        <p style="margin-top: 10px;">Tap the number to copy. Account Name: GOD'STIME AIGIOMAWU</p>
+    </div>
+    <p>More plans coming soon...</p>
+  </div>
+</section>
+
+<section id="faq" class="show">
+  <h3>Frequently Asked Questions</h3>
+  <div class="card">
+    <p><b>Q:</b> How do I pay?<br><b>A:</b> Transfer ₦1000 to our OPay account, then send proof on WhatsApp.</p>
+    <p><b>Q:</b> When will I get my code?<br><b>A:</b> Once admin verifies your payment, you’ll receive your unlock code immediately.</p>
+    <p><b>Q:</b> How many websites can I generate?<br><b>A:</b> Currently you can generate up to unlimited websites with your code.</p>
+  </div>
+</section>
+
+<section id="testimonials" class="show">
+  <h3>What People Say</h3>
+  <div class="grid">
+    <div class="card"><p>⭐ “This builder helped me launch my school website fast!” – John</p></div>
+    <div class="card"><p>⭐ “Easy to use and very cheap. I recommend it.” – Mary</p></div>
+    <div class="card"><p>⭐ “I couldn’t believe AI made my business site in minutes.” – Tunde</p></div>
+  </div>
+</section>
+
+<section id="contact" class="show">
+  <h3>Contact Us</h3>
+  <div class="card">
+    <p>📞 WhatsApp: <a href="https://wa.me/2347082479932" target="_blank">Chat with us</a></p>
+    <p>📧 Email: iamdan4live@gmail.com</p>
+    <p>Follow us on social media (coming soon!)</p>
+  </div>
+</section>
+
+<section id="requestForm" class="show">
+  <h3>Request a Website & Submit Payment Proof</h3>
+  <div class="card">
+    <label>Full Name</label>
+    <input id="requestName" placeholder="e.g., John Doe">
+    <label>Contact (Phone/Email)</label>
+    <input id="requestContact" placeholder="e.g., +2347012345678">
+    <label>Website Description</label>
+    <textarea id="requestDesc" rows="3" placeholder="Briefly describe the website you want"></textarea>
+    <label>Transaction ID</label>
+    <input id="txnId" placeholder="Optional">
+    <label>Upload Payment Screenshot</label>
+    <input id="proofFile" type="file" accept="image/*" />
+    <button onclick="sendToWhatsApp()">Send Request + Proof to WhatsApp</button>
+    <p id="submitStatus"></p>
+  </div>
+</section>
+<section id="builder" class="show">
+  <h3>AI Website Builder & Tools</h3>
+
+  <div class="card" id="freeTrialIntro">
+    <h4>✨ Free Trial: Test Our Core Tools (3 Uses Each)</h4>
+    <p>Try the AI Website Builder and File-to-Link Converter **3 times each** before unlocking the full suite of unlimited tools!</p>
+  </div>
+
+  <div class="tool-content" id="builderCard-trial">
+    <h4>Try the AI Website Builder (Trial)</h4>
+    <label>Project Name</label>
+    <input id="projectName-trial" placeholder="Project Name">
+    <label>Client Name</label>
+    <input id="clientNameForSite-trial" placeholder="Client Name">
+    <label>Website Description</label>
+    <textarea id="websitePrompt-trial" rows="3" placeholder="Describe the website..."></textarea>
+    <button id="generateWebsiteBtn-trial" onclick="generateWebsiteTrial()">Generate Website (Trial Use)</button>
+    <p id="siteCountInfo-trial" style="color:#facc15; margin-top:10px;">Remaining uses: 3</p>
+    <div id="trialBuilderOutput" style="margin-top:15px; background:#1e293b; padding:10px; border-radius:8px; border:1px solid #7c3aed;">
+      <textarea id="generatedCode-trial" rows="5" placeholder="Your generated website code will appear here"></textarea>
+      <div class="btn-group">
+        <button class="btn alt" onclick="copyGeneratedWebsiteTrial()">Copy HTML</button>
+        <button class="btn alt" onclick="previewGeneratedWebsiteTrial()">Preview</button>
+      </div>
+      <iframe id="previewFrame-trial" class="hidden"></iframe>
+    </div>
+  </div>
+
+  <div class="tool-content" id="fileLinkTool-trial">
+    <h4>Try the File-to-Link Converter (Trial)</h4>
+    <p>Upload a file and get a public link instantly (3-use limit).</p>
+    <div class="ftl-container">
+      <input type="file" id="fileInput-trial">
+      <button id="generateLinkBtn-trial" disabled onclick="generateLinkTrial()">Get Public Link (Trial Use)</button>
+      <p id="linkCountInfo-trial" style="color:#facc15; margin-top:10px;">Remaining uses: 3</p>
+      <div class="url-output" id="linkOutput-trial" style="margin-top:10px;"></div>
+      <img id="filePreview-trial" class="ftl-preview" style="display:none;">
+      <video id="videoPreview-trial" controls style="display:none;"></video>
+      <audio id="audioPreview-trial" controls style="display:none;"></audio>
+      <div class="btn-group" id="actionButtons-trial" style="display:none;"></div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="trialLimitReached" style="background:#ef4444; border:2px solid #facc15;">
+    <h4>🔴 Trial Limit Reached!</h4>
+    <p>Unlock the full suite of tools to use the **AI Website Builder** and **File-to-Link Converter** **unlimitedly**, plus access 4 other premium tools.</p>
+  </div>
+
+  <div class="card" id="lockedCard">
+    <p>To unlock, enter the <b>approval code</b> sent by admin via WhatsApp and your contact used for payment.</p>
+    <label>Approval Code</label>
+    <input id="accessCodeInput" placeholder="Enter approval code" />
+    <label>Contact</label>
+    <input id="accessContactInput" placeholder="Enter contact used" />
+    <button onclick="unlockBuilder()">Unlock Builder & Tools</button>
+  </div>
+
+  <div class="card hidden" id="toolSelectionCard">
+    <h4>Select a Tool</h4>
+    <p>Click on any card to open and use the tool.</p>
+    <div class="tool-grid">
+      <div class="tool-card" onclick="openTool('builderCard')">
+        <div class="icon">💻</div>
+        <h4>AI Website Builder</h4>
+        <p>Generate a full website with AI.</p>
+      </div>
+      <div class="tool-card" onclick="openTool('fileLinkTool')">
+        <div class="icon">🔗</div>
+        <h4>File-to-Link Converter</h4>
+        <p>Upload files and get a public link.</p>
+      </div>
+      <div class="tool-card" onclick="openTool('aiAssistantTool')">
+        <div class="icon">💬</div>
+        <h4>AI Chat Assistant</h4>
+        <p>Chat with a helpful AI.</p>
+      </div>
+      <div class="tool-card" onclick="openTool('codeTool')">
+        <div class="icon">🔧</div>
+        <h4>Code Minifier/Formatter</h4>
+        <p>Clean or beautify your code.</p>
+      </div>
+      <div class="tool-card" onclick="openTool('quizTool')">
+        <div class="icon">🧠</div>
+        <h4>AI Quiz Tool</h4>
+        <p>Test your knowledge.</p>
+      </div>
+      <div class="tool-card" onclick="openTool('libraryTool')">
+        <div class="icon">📚</div>
+        <h4>Alphatekx Library</h4>
+        <p>Search for online books/stories.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-content hidden" id="builderCard">
+    <button onclick="closeTool('builderCard')">← Back to Tools</button>
+    <h4>Describe the website you want</h4>
+    <label>Project Name</label>
+    <input id="projectName" placeholder="Project Name">
+    <label>Client Name</label>
+    <input id="clientNameForSite" placeholder="Client Name">
+    <label>Website Description</label>
+    <textarea id="websitePrompt" rows="3" placeholder="Describe the website..."></textarea>
+    <button id="generateWebsiteBtn" onclick="generateWebsite()">Generate Website</button>
+    <div class="btn-group">
+      <button class="btn alt" onclick="copyGeneratedWebsite()">Copy HTML</button>
+      <button class="btn alt" onclick="previewGeneratedWebsite()">Preview</button>
+    </div>
+    <h4>Generated Website Code:</h4>
+    <textarea id="generatedCode" rows="10" placeholder="Your generated website code will appear here"></textarea>
+    <iframe id="previewFrame" class="hidden"></iframe>
+    <p id="siteCountInfo" style="color:#facc15; margin-top:10px;">Websites generated: 0 / 5</p>
+  </div>
+
+  <div class="tool-content hidden" id="fileLinkTool">
+    <button onclick="closeTool('fileLinkTool')">← Back to Tools</button>
+    <h4>File-to-Link Converter</h4>
+    <p>Upload any image, video, audio, or document and get a working public link instantly.</p>
+    <div class="ftl-container">
+      <input type="file" id="fileInput">
+      <button id="generateLinkBtn" disabled>Get Public Link</button>
+      <div class="url-output" id="linkOutput"></div>
+      <img id="filePreview" class="ftl-preview" style="display:none;">
+      <video id="videoPreview" controls style="display:none;"></video>
+      <audio id="audioPreview" controls style="display:none;"></audio>
+      <div class="btn-group" id="actionButtons" style="display:none;"></div>
+      <div class="history">
+        <h5>Recent Links:</h5>
+        <div id="linkHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-content hidden" id="aiAssistantTool">
+    <button onclick="closeTool('aiAssistantTool')">← Back to Tools</button>
+    <h4>AI Chat Assistant</h4>
+    <div id="chat-container">
+      <header>
+        AI Assistant
+        <button id="clear-btn">Clear</button>
+      </header>
+      <div id="chat-box"></div>
+      <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-btn">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-content hidden" id="codeTool">
+    <button onclick="closeTool('codeTool')">← Back to Tools</button>
+    <h4>Code Minifier & Formatter</h4>
+    <p>Clean up or beautify your HTML, CSS, or JavaScript code instantly.</p>
+    <label>Code Input</label>
+    <textarea id="codeInput" rows="8" placeholder="Paste your HTML, CSS, or JavaScript code here..."></textarea>
+    <div class="btn-group">
+      <button onclick="minifyCode()">Minify Code</button>
+      <button class="btn alt" onclick="formatCode()">Format Code</button>
+      <button class="btn alt" onclick="copyOutputCode()">Copy Output</button>
+    </div>
+    <label style="margin-top: 15px;">Code Output</label>
+    <textarea id="codeOutput" rows="8" readonly placeholder="Processed code will appear here..."></textarea>
+  </div>
+
+  <div class="tool-content hidden" id="quizTool">
+    <button onclick="closeTool('quizTool')">← Back to Tools</button>
+    <h4>AI Quiz Tool</h4>
+    <p>Test your knowledge with 5 general knowledge questions!</p>
+    <div id="quiz-container">
+        <div class="loading">Initializing Quiz...</div>
+    </div>
+    <div style="margin-top: 15px; color: #facc15;">
+        <small>Questions powered by OpenTDB API.</small>
+    </div>
+  </div>
+
+  <div class="tool-content hidden" id="libraryTool">
+    <button onclick="closeTool('libraryTool')">← Back to Tools</button>
+    <h4>Alphatekx Library (Google Search)</h4>
+    <p>Search for PDF copies of stories or books and find a link to read them online via Google.</p>
+    <div id="searchContainer">
+      <input type="text" id="librarySearchBar" placeholder="Type your story or book title here...">
+      <button id="librarySearchBtn">Search</button>
+    </div>
+    <div class="books-container" id="booksContainer"></div>
+  </div>
+</section>
+
+
+
+
+  
+  <div class="tool-content hidden" id="builderCard">
+    <button onclick="closeTool('builderCard')">← Back to Tools</button>
+    <h4>Describe the website you want</h4>
+    <label>Project Name</label>
+    <input id="projectName" placeholder="Project Name">
+    <label>Client Name</label>
+    <input id="clientNameForSite" placeholder="Client Name">
+    <label>Website Description</label>
+    <textarea id="websitePrompt" rows="3" placeholder="Describe the website..."></textarea>
+    <button onclick="generateWebsite()">Generate Website</button>
+    <div class="btn-group">
+      <button class="btn alt" onclick="copyGeneratedWebsite()">Copy HTML</button>
+      <button class="btn alt" onclick="previewGeneratedWebsite()">Preview</button>
+    </div>
+    <h4>Generated Website Code:</h4>
+    <textarea id="generatedCode" rows="10" placeholder="Your generated website code will appear here"></textarea>
+    <iframe id="previewFrame" class="hidden"></iframe>
+    <p id="siteCountInfo" style="color:#facc15; margin-top:10px;">Websites generated: 0 / 5</p>
+  </div>
+
+  <div class="tool-content hidden" id="fileLinkTool">
+    <button onclick="closeTool('fileLinkTool')">← Back to Tools</button>
+    <h4>File-to-Link Converter</h4>
+    <p>Upload any image, video, audio, or document and get a working public link instantly.</p>
+    <div class="ftl-container">
+      <input type="file" id="fileInput">
+      <button id="generateLinkBtn" disabled>Get Public Link</button>
+      <div class="url-output" id="linkOutput"></div>
+      <img id="filePreview" class="ftl-preview" style="display:none;">
+      <video id="videoPreview" controls style="display:none;"></video>
+      <audio id="audioPreview" controls style="display:none;"></audio>
+      <div class="btn-group" id="actionButtons" style="display:none;"></div>
+      <div class="history">
+        <h5>Recent Links:</h5>
+        <div id="linkHistory"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-content hidden" id="aiAssistantTool">
+    <button onclick="closeTool('aiAssistantTool')">← Back to Tools</button>
+    <h4>AI Chat Assistant</h4>
+    <div id="chat-container">
+      <header>
+        AI Assistant
+        <button id="clear-btn">Clear</button>
+      </header>
+      <div id="chat-box"></div>
+      <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-btn">➤</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="tool-content hidden" id="codeTool">
+    <button onclick="closeTool('codeTool')">← Back to Tools</button>
+    <h4>Code Minifier & Formatter</h4>
+    <p>Clean up or beautify your HTML, CSS, or JavaScript code instantly.</p>
+    <label>Code Input</label>
+    <textarea id="codeInput" rows="8" placeholder="Paste your HTML, CSS, or JavaScript code here..."></textarea>
+    <div class="btn-group">
+      <button onclick="minifyCode()">Minify Code</button>
+      <button class="btn alt" onclick="formatCode()">Format Code</button>
+      <button class="btn alt" onclick="copyOutputCode()">Copy Output</button>
+    </div>
+    <label style="margin-top: 15px;">Code Output</label>
+    <textarea id="codeOutput" rows="8" readonly placeholder="Processed code will appear here..."></textarea>
+  </div>
+
+  <div class="tool-content hidden" id="quizTool">
+    <button onclick="closeTool('quizTool')">← Back to Tools</button>
+    <h4>AI Quiz Tool</h4>
+    <p>Test your knowledge with 5 general knowledge questions!</p>
+    <div id="quiz-container">
+        <div class="loading">Initializing Quiz...</div>
+    </div>
+    <div style="margin-top: 15px; color: #facc15;">
+        <small>Questions powered by OpenTDB API.</small>
+    </div>
+  </div>
+
+  <div class="tool-content hidden" id="libraryTool">
+    <button onclick="closeTool('libraryTool')">← Back to Tools</button>
+    <h4>Alphatekx Library (Google Search)</h4>
+    <p>Search for PDF copies of stories or books and find a link to read them online via Google.</p>
+    <div id="searchContainer">
+      <input type="text" id="librarySearchBar" placeholder="Type your story or book title here...">
+      <button id="librarySearchBtn">Search</button>
+    </div>
+    <div class="books-container" id="booksContainer"></div>
+  </div>
+</section>
+
+<script>
+/* ====== CONFIG: change your secret code here to whatever you will give users ====== */
+const SECRET_CODE = "ALPHATEKX2025,20-#232024"; // <- put the exact code you will give users here
+
+const WEBSITE_BUILDER_API_KEY = "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";
+const IMGBB_API_KEY = "2dde1958c3db11b61421b8a23417a429";
+const AI_ASSISTANT_API_KEY = "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";
+
+
+/* ====== FREE TRIAL GLOBAL COUNTERS AND UTILITIES - NEW LOGIC ====== */
+const TRIAL_LIMIT = 3;
+const BUILDER_KEY = 'alphatekx_builder_trial';
+const FILELINK_KEY = 'alphatekx_filelink_trial';
+let selectedFileTrial = null; // Variable for trial file
+
+// Function to get or initialize a counter
+function getTrialCount(key) {
+    const count = localStorage.getItem(key);
+    if (count === null) {
+        localStorage.setItem(key, TRIAL_LIMIT);
+        return TRIAL_LIMIT;
+    }
+    return parseInt(count, 10);
+}
+
+// Function to update the display text for a tool
+function updateTrialDisplay(key, elementId) {
+    const count = getTrialCount(key);
+    const element = document.getElementById(elementId);
+    const limitCard = document.getElementById('trialLimitReached');
+
+    if (element) {
+        element.textContent = `Remaining uses: ${count}`;
+        if (count <= 0) {
+            element.textContent = "Limit reached. Unlock the full tools!";
+            // Show the generic unlock message
+            if (limitCard) limitCard.classList.remove('hidden');
+            // Disable trial buttons
+            if (key === BUILDER_KEY) document.getElementById('generateWebsiteBtn-trial').disabled = true;
+            if (key === FILELINK_KEY) document.getElementById('generateLinkBtn-trial').disabled = true;
+        } else {
+            if (limitCard) limitCard.classList.add('hidden');
+            // Enable trial buttons (if not disabled by file selection)
+            if (key === BUILDER_KEY) document.getElementById('generateWebsiteBtn-trial').disabled = false;
+        }
+    }
+}
+
+// Function to check if a tool is locked
+function isTrialLocked(key) {
+    return getTrialCount(key) <= 0;
+}
+
+// Function to decrement the counter
+function decrementTrialCount(key) {
+    let count = getTrialCount(key);
+    if (count > 0) {
+        count--;
+        localStorage.setItem(key, count);
+    }
+    return count;
+}
+/* ------------------------------------------------------------------ */
+
+
+/* --- NEW Function to copy OPay Number --- */
+function copyOpayNumber() {
+    const opayNumber = "07033497264"; // No spaces for cleaner copying
+    navigator.clipboard.writeText(opayNumber).then(() => {
+        alert("OPay account number copied to clipboard: " + opayNumber);
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+        alert("Failed to copy. Please manually select and copy the number.");
+    });
+}
+/* ------------------------------------------- */
+
+/* ---------- TOGGLE HAMBURGER MENU ---------- */
+function toggleMenu() {
+  const navLinks = document.querySelector('.nav-links');
+  navLinks.classList.toggle('active');
+}
+
+/* ---------- WhatsApp request form ---------- */
+function sendToWhatsApp() {
+  const name = document.getElementById("requestName").value.trim();
+  const contact = document.getElementById("requestContact").value.trim();
+  const desc = document.getElementById("requestDesc").value.trim();
+  if(!name || !contact || !desc){ alert("Please fill all fields before sending!"); return; }
+  const msg = `Hello Daniel,%0A%0AI want to request a website.%0AName: ${encodeURIComponent(name)}%0AContact: ${encodeURIComponent(contact)}%0ADescription: ${encodeURIComponent(desc)}`;
+  const waLink = `https://wa.me/2347082479932?text=${msg}`;
+  window.open(waLink, "_blank");
+  alert("Your request has been prepared for WhatsApp. Please send it to 07082479932.");
+}
+
+/* ---------- Payment proof submission (kept as before) ---------- */
+let proofSubmissions = [];
+function submitProof() {
+  const name = document.getElementById("payerName") ? document.getElementById("payerName").value.trim() : "";
+  const contact = document.getElementById("payerContact") ? document.getElementById("payerContact").value.trim() : "";
+  const txn = document.getElementById("txnId") ? document.getElementById("txnId").value.trim() : "";
+  const fileElem = document.getElementById("proofFile");
+  const file = fileElem && fileElem.files ? fileElem.files[0] : null;
+  if(!name || !contact || !file){ alert("Please provide your name, contact, and screenshot file."); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    proofSubmissions.push({ name, contact, txn, fileData: e.target.result, approved: false, code: "" });
+    document.getElementById("submitStatus").textContent = "Proof submitted! Admin will verify and give you a code.";
+    if(document.getElementById("payerName")) document.getElementById("payerName").value="";
+    if(document.getElementById("payerContact")) document.getElementById("payerContact").value="";
+    if(document.getElementById("txnId")) document.getElementById("txnId").value="";
+    if(document.getElementById("proofFile")) document.getElementById("proofFile").value="";
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---------- Unlock Website Builder & Tools (UPDATED) ---------- */
+function unlockBuilder() {
+  const code = document.getElementById("accessCodeInput").value.trim();
+  const contact = document.getElementById("accessContactInput").value.trim();
+  if(!code || !contact){ alert("Please enter your approval code and contact."); return; }
+  if(code === SECRET_CODE){
+    // Hide lock card and show tool selection card
+    document.getElementById("lockedCard").classList.add("hidden");
+    document.getElementById("toolSelectionCard").classList.remove("hidden"); 
+    alert("Access granted! Select a tool to begin.");
+    // Ensure all tool content is hidden when tool selection shows
+    document.querySelectorAll('.tool-content').forEach(card => {
+        if (!card.id.endsWith('-trial')) { // Keep trial tools visible if they are not the ones being unlocked
+            card.classList.add('hidden');
+        }
+    });
+    
+    // Initialize tools that need setup (like the chat) after unlock
+    initAIChat();
+    initLibraryTool();
+  } else {
+    alert("Invalid code. Make sure admin has approved your payment and you have the correct approval code.");
+  }
+}
+
+/* ---------- Tool Selector/Opener Functions (NEW) ---------- */
+function openTool(toolId) {
+    // Hide the tool selection card
+    document.getElementById('toolSelectionCard').classList.add('hidden');
+    
+    // Hide all other UNLOCKED tool content cards (Trial ones are already visible)
+    document.querySelectorAll('.tool-content').forEach(card => {
+        if (!card.id.endsWith('-trial')) {
+            card.classList.add('hidden');
+        }
+    });
+
+    // Show the selected tool content card
+    const selectedTool = document.getElementById(toolId);
+    if (selectedTool) {
+        selectedTool.classList.remove('hidden');
+        
+        // Special initialization for the quiz tool
+        if (toolId === 'quizTool') {
+            initializeQuizTool();
+        }
+    }
+}
+
+function closeTool(toolId) {
+    // Hide the currently open tool
+    document.getElementById(toolId).classList.add('hidden');
+    
+    // Show the tool selection card
+    document.getElementById('toolSelectionCard').classList.remove('hidden');
+}
+
+/* ---------------------------------------------------------------------------------- */
+/* ---------- WEBSITE BUILDER CORE FUNCTIONS (MODIFIED TO BE FLEXIBLE) ---------- */
+
+// Core generation logic, now using arguments for flexibility
+async function generateWebsiteCore(projectInId, clientInId, promptInId, codeOutId, buttonId, previewFrameId) {
+    const project = document.getElementById(projectInId).value.trim();
+    const client = document.getElementById(clientInId).value.trim();
+    const prompt = document.getElementById(promptInId).value.trim();
+    const generatedCodeElement = document.getElementById(codeOutId);
+    const generateButton = document.getElementById(buttonId);
+
+    if(!project || !client || !prompt){ alert("Please fill all fields to generate website."); return; }
+
+    try {
+        generatedCodeElement.value = "Generating website... please wait.";
+        generateButton.disabled = true;
+
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${WEBSITE_BUILDER_API_KEY}` },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role:"system", content:"You are an AI that generates fully working website HTML, CSS, and minimal JS. Do not provide explanation, only provide the code. Make it clean, modern, and professional." },
+                    { role:"user", content:`Project Name: ${project}\nClient Name: ${client}\nWebsite Description: ${prompt}\nOutput: full HTML website code with inline CSS and JS where needed.` }
+                ],
+                temperature: 0.7,
+                max_tokens: 4000
+            })
+        });
+
+        const data = await response.json();
+        const websiteCode = data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content.trim() : "No code returned.";
+        generatedCodeElement.value = websiteCode;
+        alert("Website generated! You can preview or copy the code.");
+    } catch(err) {
+        console.error(err);
+        alert("Error generating website. Check your API key and internet connection.");
+    } finally {
+        generateButton.disabled = false;
+    }
+}
+
+/* ---------- UNLIMITED WEBSITE BUILDER (Original) ---------- */
+function generateWebsite() {
+    // Calls the core function with UNLIMITED element IDs
+    generateWebsiteCore('projectName', 'clientNameForSite', 'websitePrompt', 'generatedCode', 'generateWebsiteBtn', 'previewFrame');
+}
+
+/* ---------- TRIAL WEBSITE BUILDER (NEW) ---------- */
+function generateWebsiteTrial() {
+    if (isTrialLocked(BUILDER_KEY)) {
+        alert("Trial limit reached! Please unlock the full tools for unlimited use.");
+        return;
+    }
+    
+    // Decrement counter
+    decrementTrialCount(BUILDER_KEY);
+    updateTrialDisplay(BUILDER_KEY, 'siteCountInfo-trial');
+
+    // Calls the core function with TRIAL element IDs
+    generateWebsiteCore('projectName-trial', 'clientNameForSite-trial', 'websitePrompt-trial', 'generatedCode-trial', 'generateWebsiteBtn-trial', 'previewFrame-trial');
+}
+
+/* ---------- Builder helper functions (Original and Trial) ---------- */
+function previewGeneratedWebsite() {
+  const code = document.getElementById("generatedCode").value.trim();
+  if(!code){ alert("No code to preview!"); return; }
+  const iframe = document.getElementById("previewFrame");
+  iframe.srcdoc = code;
+  iframe.classList.remove("hidden");
+}
+
+function copyGeneratedWebsite() {
+  const code = document.getElementById("generatedCode").value.trim();
+  if(!code){ alert("No code to copy!"); return; }
+  navigator.clipboard.writeText(code).then(()=>alert("Code copied to clipboard!"));
+}
+
+function previewGeneratedWebsiteTrial() {
+  const code = document.getElementById("generatedCode-trial").value.trim();
+  if(!code){ alert("No code to preview!"); return; }
+  const iframe = document.getElementById("previewFrame-trial");
+  iframe.srcdoc = code;
+  iframe.classList.remove("hidden");
+}
+
+function copyGeneratedWebsiteTrial() {
+  const code = document.getElementById("generatedCode-trial").value.trim();
+  if(!code){ alert("No code to copy!"); return; }
+  navigator.clipboard.writeText(code).then(()=>alert("Code copied to clipboard!"));
+}
+/* ---------------------------------------------------------------------------------- */
+
+
+/* ---------- Admin panel (kept as in your original) ---------- */
+document.getElementById("openAdminLink").addEventListener("click", ()=>{
+  document.getElementById("adminModal").style.display = "flex";
+});
+
+function closeAdmin() { document.getElementById("adminModal").style.display="none"; }
+
+let loggedInAdmin = null;
+function adminLogin() {
+  const user = document.getElementById("adminUser").value;
+  const pass = document.getElementById("adminPass").value;
+  if(user==="admin" && pass==="admin123"){
+    loggedInAdmin = user;
+    document.getElementById("adminLoginView").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
+    // adminNameShow may not exist in original; safe guard:
+    if(document.getElementById("adminNameShow")) document.getElementById("adminNameShow").textContent = loggedInAdmin;
+    renderProofs();
+  } else { alert("Invalid admin credentials."); }
+}
+
+function logoutAdmin() {
+  loggedInAdmin = null;
+  document.getElementById("adminLoginView").classList.remove("hidden");
+  document.getElementById("adminPanel").classList.add("hidden");
+}
+
+/* ---------- Render proof submissions helper ---------- */
+function renderProofs() {
+  const tbody = document.querySelector("#proofsTable tbody");
+  if(!tbody) return;
+  tbody.innerHTML = "";
+  proofSubmissions.forEach((p, idx)=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td>${p.name}</td>
+      <td>${p.contact}</td>
+      <td>${p.txn||"-"}</td>
+      <td><img src="${p.fileData}" class="img-thumb"/></td>
+      <td>${p.approved?'<span class="ok">Approved</span>':'<span class="bad">Pending</span>'}</td>
+      <td>${p.code||"-"}</td>
+      <td>
+        ${!p.approved?`<button class="btn" onclick="approveProof(${idx})">Approve & Generate Code</button>`:"-"}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function approveProof(idx){
+  // generate a one-time code and mark as approved
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let code = "";
+  for(let i=0;i<8;i++) code += chars.charAt(Math.floor(Math.random()*chars.length));
+  proofSubmissions[idx].approved = true;
+  proofSubmissions[idx].code = code;
+  alert(`Proof approved! Approval code for user: ${code}`);
+  renderProofs();
+}
+
+/* ---------------------------------------------------------------------------------- */
+/* ---------- FILE-TO-LINK CORE FUNCTIONS (MODIFIED TO BE FLEXIBLE) ---------- */
+
+// Core link generation logic, now using arguments for flexibility
+async function generateLinkCore(file, linkOutId, buttonId, filePreviewId, videoPreviewId, audioPreviewId, actionDivId, isTrial) {
+  const API_ENDPOINT = `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`;
+  const linkOutput = document.getElementById(linkOutId);
+  const generateLinkBtn = document.getElementById(buttonId);
+  const filePreview = document.getElementById(filePreviewId);
+  const videoPreview = document.getElementById(videoPreviewId);
+  const audioPreview = document.getElementById(audioPreviewId);
+  const actionDiv = document.getElementById(actionDivId);
+
+  if (!file) {
+    alert('Please choose a file first.');
+    return;
+  }
+
+  generateLinkBtn.disabled = true;
+  generateLinkBtn.textContent = 'Uploading... Please wait...';
+  linkOutput.textContent = 'Uploading file to server...';
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+
+  reader.onload = async (e) => {
+    const base64Data = e.target.result.split(',')[1];
+    const formData = new FormData();
+    formData.append('image', base64Data);
+
+    try {
+      const response = await fetch(API_ENDPOINT, { method: 'POST', body: formData });
+      const data = await response.json();
+
+      if (data.success) {
+        const publicUrl = data.data.url;
+        
+        // Display link
+        linkOutput.textContent = publicUrl;
+
+        // Hide all previews first
+        if(filePreview) filePreview.style.display = 'none';
+        if(videoPreview) videoPreview.style.display = 'none';
+        if(audioPreview) audioPreview.style.display = 'none';
+
+        // Show preview based on type
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (['jpg','jpeg','png','gif','bmp','webp'].includes(ext) && filePreview) {
+          filePreview.src = publicUrl;
+          filePreview.style.display = 'block';
+        } else if (['mp4','webm','ogg'].includes(ext) && videoPreview) {
+          videoPreview.src = publicUrl;
+          videoPreview.style.display = 'block';
+          videoPreview.load();
+        } else if (['mp3','wav','ogg'].includes(ext) && audioPreview) {
+          audioPreview.src = publicUrl;
+          audioPreview.style.display = 'block';
+          audioPreview.load();
+        }
+
+        // Show action buttons
+        if(actionDiv){
+            actionDiv.innerHTML = '';
+            actionDiv.style.display = 'block';
+
+            const copyBtn = document.createElement('button');
+            copyBtn.textContent = 'Copy Link';
+            copyBtn.onclick = () => {
+              navigator.clipboard.writeText(publicUrl).then(() => alert('Link copied!'));
+            };
+            actionDiv.appendChild(copyBtn);
+
+            const openBtn = document.createElement('button');
+            openBtn.textContent = 'Open Link';
+            openBtn.onclick = () => window.open(publicUrl, '_blank');
+            actionDiv.appendChild(openBtn);
+        }
+
+        // Only update history for the UNLIMITED tool
+        if (!isTrial) { 
+            const savedHistory = JSON.parse(localStorage.getItem('alphatekxLinks')) || [];
+            savedHistory.unshift(publicUrl);
+            if (savedHistory.length > 10) savedHistory.pop();
+            localStorage.setItem('alphatekxLinks', JSON.stringify(savedHistory));
+            updateHistory(savedHistory);
+        }
+
+      } else {
+        linkOutput.textContent = `Upload failed: ${data.error.message || 'Unknown API error.'}`;
+      }
+    } catch (err) {
+      linkOutput.textContent = `Error: Could not connect to the API. ${err.message}`;
+    } finally {
+      generateLinkBtn.disabled = false;
+      generateLinkBtn.textContent = isTrial ? 'Get Public Link (Trial Use)' : 'Get Public Link';
+    }
+  };
+}
+
+/* ---------- TRIAL FILE-TO-LINK CONVERTER (NEW) ---------- */
+function generateLinkTrial() {
+    if (isTrialLocked(FILELINK_KEY)) {
+        alert("Trial limit reached! Please unlock the full tools for unlimited file uploads.");
+        return;
+    }
+    
+    // Decrement counter
+    decrementTrialCount(FILELINK_KEY);
+    updateTrialDisplay(FILELINK_KEY, 'linkCountInfo-trial');
+
+    // Calls the core function with TRIAL element IDs and flag
+    generateLinkCore(selectedFileTrial, 'linkOutput-trial', 'generateLinkBtn-trial', 'filePreview-trial', 'videoPreview-trial', 'audioPreview-trial', 'actionButtons-trial', true);
+}
+/* ---------------------------------------------------------------------------------- */
+
+
+/* ---------- DOM CONTENT LOADED LISTENER (MODIFIED) ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  
+  // Initial display updates for trial counters
+  updateTrialDisplay(BUILDER_KEY, 'siteCountInfo-trial');
+  updateTrialDisplay(FILELINK_KEY, 'linkCountInfo-trial');
+
+  // File-to-link variables for UNLIMITED tool
+  const fileInput = document.getElementById('fileInput');
+  const generateLinkBtn = document.getElementById('generateLinkBtn');
+  const linkOutput = document.getElementById('linkOutput');
+  const linkHistoryDiv = document.getElementById('linkHistory');
+  let selectedFileUnlimited = null; // New variable for unlimited file
+
+  // Load history from localStorage (only for UNLIMITED tool)
+  const savedHistory = JSON.parse(localStorage.getItem('alphatekxLinks')) || [];
+  updateHistory(savedHistory);
+
+  if(fileInput) fileInput.addEventListener('change', (event) => {
+    selectedFileUnlimited = event.target.files[0];
+    linkOutput.textContent = selectedFileUnlimited ? 'Ready to upload...' : '';
+    document.getElementById('filePreview').style.display = 'none';
+    document.getElementById('videoPreview').style.display = 'none';
+    document.getElementById('audioPreview').style.display = 'none';
+    document.getElementById('actionButtons').style.display = 'none';
+    generateLinkBtn.disabled = !selectedFileUnlimited;
+  });
+
+  if(generateLinkBtn) generateLinkBtn.addEventListener('click', () => {
+    if (!selectedFileUnlimited) {
+      alert('Please choose a file first.');
+      return;
+    }
+    // Call the core function for UNLIMITED use
+    generateLinkCore(selectedFileUnlimited, 'linkOutput', 'generateLinkBtn', 'filePreview', 'videoPreview', 'audioPreview', 'actionButtons', false);
+  });
+  
+  // File-to-link variables and listeners for TRIAL tool
+  const fileInputTrial = document.getElementById('fileInput-trial');
+  const generateLinkBtnTrial = document.getElementById('generateLinkBtn-trial');
+
+  if(fileInputTrial && generateLinkBtnTrial) {
+    // Check initial lock status
+    if (isTrialLocked(FILELINK_KEY)) {
+        generateLinkBtnTrial.disabled = true;
+    }
+
+    fileInputTrial.addEventListener('change', (event) => {
+        selectedFileTrial = event.target.files[0];
+        const linkOutputTrial = document.getElementById('linkOutput-trial');
+        
+        if (isTrialLocked(FILELINK_KEY)) {
+             linkOutputTrial.textContent = 'Limit reached. Unlock for more!';
+             generateLinkBtnTrial.disabled = true;
+        } else {
+            linkOutputTrial.textContent = selectedFileTrial ? 'Ready to upload...' : '';
+            document.getElementById('filePreview-trial').style.display = 'none';
+            document.getElementById('videoPreview-trial').style.display = 'none';
+            document.getElementById('audioPreview-trial').style.display = 'none';
+            document.getElementById('actionButtons-trial').style.display = 'none';
+            generateLinkBtnTrial.disabled = !selectedFileTrial;
+        }
+    });
+  }
+
+  function updateHistory(history) {
+    if(!linkHistoryDiv) return;
+    linkHistoryDiv.innerHTML = '';
+    history.forEach(link => {
+      const a = document.createElement('a');
+      a.href = link;
+      a.target = '_blank';
+      a.textContent = link;
+      linkHistoryDiv.appendChild(a);
+      linkHistoryDiv.appendChild(document.createElement('br'));
+    });
+  }
+});
+
+/* ---------- AI Assistant (kept intact) ---------- */
+function initAIChat(){
+  // elements inside aiAssistantTool
+  const input = document.getElementById("user-input");
+  const chatBox = document.getElementById("chat-box");
+  const sendBtn = document.getElementById("send-btn");
+  const clearBtn = document.getElementById("clear-btn");
+
+  if (!input || !chatBox || !sendBtn) return; // Exit if elements aren't found (locked state)
+
+  function typeMessage(element, text, delay = 7) {
+    element.textContent = "";
+    let i = 0;
+    const interval = setInterval(() => {
+      element.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) clearInterval(interval);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, delay);
+  }
+
+  async function sendMessage() {
+    const userText = input.value.trim();
+    if (!userText) return;
+
+    const userMessage = document.createElement("div");
+    userMessage.className = "message user";
+    userMessage.textContent = userText;
+    chatBox.appendChild(userMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    input.value = "";
+
+    const botMessage = document.createElement("div");
+    botMessage.className = "message bot";
+    botMessage.textContent = "Typing...";
+    chatBox.appendChild(botMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${AI_ASSISTANT_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are a helpful AI assistant." },
+            { role: "user", content: userText }
+          ],
+          max_tokens: 1000
+        })
+      });
+
+      const data = await response.json();
+      const botReply = data && data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "Sorry, I couldn't get a reply.";
+      typeMessage(botMessage, botReply);
+
+    } catch (error) {
+      console.error(error);
+      botMessage.textContent = "Oops! Something went wrong. Try again.";
+    }
+  }
+
+  // Clear existing listeners to prevent duplicates if initAIChat is called multiple times
+  sendBtn.removeEventListener("click", sendMessage);
+  input.removeEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+  clearBtn.removeEventListener("click", () => { chatBox.innerHTML = ""; });
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+  clearBtn.addEventListener("click", () => { chatBox.innerHTML = ""; });
+}
+
+/* ---------- Code Minifier & Formatter Tool ---------- */
+function minifyCode() {
+  const input = document.getElementById("codeInput").value.trim();
+  if (!input) { alert("Please paste code to process."); return; }
+
+  let output = input
+    .replace(/\s+/g, ' ') // Replace multiple spaces/newlines/tabs with a single space
+    .replace(/\/\*[\s\S]*?\*\/|(?<!:)\/\/.*$/gm, '') // Remove CSS/JS comments
+    .replace(/(\s*\{\s*)/g, '{') // Remove space before/after opening brace
+    .replace(/(\s*\}\s*)/g, '}') // Remove space before/after closing brace
+    .replace(/(\s*\:\s*)/g, ':') // Remove space before/after colon
+    .replace(/(\s*\,\s*)/g, ',') // Remove space before/after comma
+    .replace(/(\s*\;\s*)/g, ';') // Remove space before/after semicolon
+    .trim();
+
+
+  document.getElementById("codeOutput").value = output;
+  alert("Code minified! Check the output box.");
+}
+
+// Note: A full-featured formatter often requires a dedicated library or API.
+// This is a basic formatter, which primarily cleans up whitespace for readability.
+function formatCode() {
+  const input = document.getElementById("codeInput").value.trim();
+  if (!input) { alert("Please paste code to process."); return; }
+
+  // Simple formatting by adding newlines before braces and closing tags for better visual structure
+  let output = input.replace(/([{};])/g, '$1\n') // Add newline after { ; }
+                    .replace(/(>)/g, '$1\n') // Add newline after closing tags (>)
+                    .replace(/(\/\*)/g, '\n$1') // Add newline before block comments
+                    .replace(/\n\s*\n/g, '\n') // Remove empty lines
+                    .trim();
+
+  document.getElementById("codeOutput").value = output;
+  alert("Code formatted! Check the output box.");
+}
+
+function copyOutputCode() {
+  const code = document.getElementById("codeOutput").value.trim();
+  if(!code){ alert("No output code to copy!"); return; }
+  navigator.clipboard.writeText(code).then(()=>alert("Output code copied to clipboard!"));
+}
+
+/* ---------- AI Quiz Tool ---------- */
+const QUIZ_API_URL = "https://opentdb.com/api.php?amount=5&type=multiple&encode=url3986";
+const quizContainer = document.getElementById('quizTool') ? document.getElementById('quizTool').querySelector('#quiz-container') : null;
+
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let selectedAnswer = null;
+
+function decodeQuizHtml(html) {
+    return new URLSearchParams('q=' + html).get('q'); 
+}
+
+function shuffleQuizArray(array) {
+    for(let i=array.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [array[i],array[j]]=[array[j],array[i]];
+    }
+    return array;
+}
+
+async function loadQuizQuestions() {
+    if (!quizContainer) return;
+
+    quizContainer.innerHTML = '<div style="text-align:center; color:#facc15;">Fetching 5 new questions...</div>';
+    
+    try {
+        const response = await fetch(QUIZ_API_URL);
+        if(!response.ok) throw new Error(`HTTP Error ${response.status}`);
+        const data = await response.json();
+        
+        if(data.response_code !== 0){
+            quizContainer.innerHTML = `<p class="bad" style="text-align:center;">API Error: Could not fetch questions.</p>`;
+            return;
+        }
+
+        questions = data.results.map(q=>{
+            const correct = decodeQuizHtml(q.correct_answer);
+            const incorrect = q.incorrect_answers.map(decodeQuizHtml);
+            return {
+                question: decodeQuizHtml(q.question),
+                options: shuffleQuizArray([correct,...incorrect]),
+                answer: correct
+            };
+        });
+
+        currentIndex = 0;
+        score = 0;
+        showQuizQuestion();
+    } catch(err){
+        console.error("Quiz Error:", err);
+        quizContainer.innerHTML = `<p class="bad" style="text-align:center;">Failed to load quiz. Try again later.</p>`;
+    }
+}
+
+function showQuizQuestion(){
+    if (!questions.length || !quizContainer) return;
+    
+    const q = questions[currentIndex];
+    selectedAnswer = null;
+
+    quizContainer.innerHTML = `
+        <div class="question-text" style="color:#e5e7eb;">Q${currentIndex+1}: ${q.question}</div>
+        <ul class="answer-list" style="list-style:none; padding:0;">
+            ${q.options.map(o=>`<li style="background:#1e293b; padding:10px; border-radius:8px; margin-bottom:8px; cursor:pointer;">${o}</li>`).join('')}
+        </ul>
+        <button id="quizActionBtn" class="${currentIndex === questions.length-1 ? 'submit-btn':'next-btn'}" disabled>${currentIndex === questions.length-1 ? 'Submit Quiz':'Next Question'}</button>
+    `;
+
+    const options = quizContainer.querySelectorAll('.answer-list li');
+    const actionBtn = document.getElementById('quizActionBtn');
+
+    options.forEach(opt=>{
+        opt.addEventListener('click', e=>{
+            if(selectedAnswer !== null) return; // Prevent changing answer after selection
+            selectedAnswer = e.target.textContent;
+            
+            options.forEach(o=>{
+                o.style.pointerEvents='none'; // Lock options
+                if(o.textContent === q.answer) {
+                    o.classList.add('correct');
+                }
+            });
+
+            if(selectedAnswer !== q.answer) {
+                e.target.classList.add('incorrect');
+            }
+            actionBtn.disabled = false;
+        });
+    });
+
+    actionBtn.onclick = () => {
+        if(selectedAnswer === q.answer) score++;
+        
+        if(currentIndex === questions.length-1){
+            showQuizResult();
+        } else {
+            currentIndex++;
+            showQuizQuestion();
+        }
+    };
+}
+
+function showQuizResult(){
+    if (!quizContainer) return;
+    
+    const maxScore = questions.length;
+
+    quizContainer.innerHTML = `
+        <div class="card" style="text-align:center; padding:20px; background:#0f172a;">
+            <h2 style="color:#facc15;">Quiz Completed!</h2>
+            <p style="font-size:1.2em; color:#e5e7eb;">You scored <b style="color:#7c3aed;">${score}</b> out of ${maxScore}</p>
+            <p style="font-size:1.1em; color:#e5e7eb;">${score === maxScore ? '🏆 Perfect Score!':score > maxScore/2 ? '🎖 Good Job! Keep it up!' : '🔰 Practice More!'}</p>
+            <button class="submit-btn" style="background:#facc15; color:#0f172a; margin-top:20px;" onclick="loadQuizQuestions()">Take Another Quiz</button>
+        </div>
+    `;
+}
+
+// Function to call when the tool is revealed to start the quiz
+function initializeQuizTool() {
+    loadQuizQuestions();
+}
+
+
+/* ---------- Library Tool (New Tool) ---------- */
+function initLibraryTool(){
+  const searchBtn = document.getElementById('librarySearchBtn');
+  const searchBar = document.getElementById('librarySearchBar');
+  const container = document.getElementById('booksContainer');
+
+  if (searchBtn) {
+    // Remove previous listener to prevent duplicates if initLibraryTool is called multiple times
+    const oldSearchBtn = searchBtn.cloneNode(true);
+    searchBtn.parentNode.replaceChild(oldSearchBtn, searchBtn);
+    const newSearchBtn = document.getElementById('librarySearchBtn'); // Get the new button
+
+    newSearchBtn.addEventListener('click', () => {
+      const query = searchBar.value.trim();
+      if(container) container.innerHTML = '';
+
+      if(query === '') {
+          alert('Please type a book or story name.');
+          return;
+      }
+
+      // Create a single card for Google search
+      const card = document.createElement('div');
+      card.className = 'book-card';
+      card.innerHTML = `
+          <img src="https://via.placeholder.com/200x300?text=Search+Results" alt="${query}">
+          <h3>${query}</h3>
+          <p style="font-size:12px; color:#94a3b8; margin-top:5px; margin-bottom:10px;">Click below to search Google for a PDF copy.</p>
+          <button onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(query + ' PDF filetype:pdf')}', '_blank')">Search for PDF Online</button>
+      `;
+      if(container) container.appendChild(card);
+    });
+  }
+}
+
+/* ---------- Optional: show sections with IntersectionObserver (keeps your original behavior) ---------- */
+const sections = document.querySelectorAll('section');
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){ entry.target.classList.add('show'); }
+  });
+}, { threshold:0.1 });
+sections.forEach(section=>observer.observe(section));
+</script>
+
+
